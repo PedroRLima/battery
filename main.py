@@ -5,7 +5,7 @@ from battery.ui.battery_ui import Ui_Dialog
 
 
 class Main(QDialog, Ui_Dialog):
-
+    
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
@@ -30,25 +30,9 @@ class Main(QDialog, Ui_Dialog):
         timer.start(1000)
 
     def battery_percentage(self):
-        bar = os.popen('acpi').read()
-        print(bar)
-        percentage = re.search('\d+%', bar)
-        num = int(percentage.group(1))
-        self.progressBar.setValue(num)
-
-        if num == 20:
-            self.systray.showMessage('Alert', 'Battery is {0}\n'
-                                              'Please connect the charger'.format(num),
-                                     QSystemTrayIcon.Warning)
-        if num == 10:
-            self.systray.showMessage('Alert', 'Battery is {0}\n'
-                                              'Computer is going to turn off'.format(num),
-                                     QSystemTrayIcon.Critical)
-
-
-
-
-
+        command = os.popen('acpi').read()
+        percentage = re.sub('%', '', re.search("\d+%", command).group())
+        self.progressBar.setValue(percentage)
 
 
 def main():
@@ -56,6 +40,7 @@ def main():
     dialog = Main()
     dialog.show()
     app.exec_()
+
 
 if __name__ == '__main__':
     main()

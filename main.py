@@ -1,4 +1,6 @@
-import os, sys, re
+import os
+import sys
+import re
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from battery.ui.battery_ui import Ui_Dialog
@@ -34,16 +36,33 @@ class Main(QDialog, Ui_Dialog):
         percentage = re.sub('%', '', re.search("\d+%", command).group())
         self.progressBar.setValue(int(percentage))
 
-        if percentage < '20':
+        if percentage == '20':
             self.alert_notification(percentage)
-        elif percentage < '10':
+        elif percentage == '10':
             self.warning_notification(percentage)
+        elif percentage == '100':
+            self.full_notification()
+        elif 'charging' in command:
+            self.charging_notification()
 
     def alert_notification(self, percentage):
-        pass
+        return self.systray.showMessage("Battery Alert!", "Battery is under {0}%\n"
+                                        "Please connect the charger!".format(percentage),
+                                        QSystemTrayIcon.Information)
 
     def warning_notification(self, percentage):
-        pass
+        return self.systray.showMessage("Battery Warning!", "Battery is under {0}%\n"
+                                        "Your PC is about to die\n"
+                                        "Connect the charger now!".format(percentage),
+                                        QSystemTrayIcon.Critical)
+
+    def full_notification(self):
+        return self.systray.showMessage("Battery Alert!", "Battery is full\n"
+                                        "You can disconnect the charger!",
+                                        QSystemTrayIcon.Information)
+
+    def charging_notification(self):
+        return self.systray.showMessage("Battery Alert", "Battery is charging", QSystemTrayIcon.Information)
 
 
 def main():
